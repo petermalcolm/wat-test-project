@@ -1,35 +1,98 @@
-<!doctype html>
-<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
-<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"><![endif]-->
-<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
-<!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
 
-        <link rel="stylesheet" href="styles/bootstrap.css">
-        <link rel="stylesheet" href="styles/main.css">
-        <script src="scripts/vendor/modernizr.min.js"></script>
-    </head>
-    <body id="index-page">
-        <div class="container">
-            <div class="hero-unit">
-                <h1>Wotcha!</h1>
-                <p>You now have</p>
-                <ul>
-                    <li>HTML5 Boilerplate</li>
-                    <li>Twitter Bootstrap</li>
-                </ul>
-                <p>installed.</p>
-                <h3>Enjoy coding!</h3>
-            </div>
+<!DOCTYPE HTML>
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800|Open+Sans+Condensed:300,300italic,700' rel='stylesheet' type='text/css'>
+<link href="/styles/game-styles.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+<!-- Markup -->
+<div id="app-wrapper">
+    <div id="scoreboard-wrapper"></div>
+    <div id="question-wrapper"></div>
+    <div id="face-wrapper"></div>
+</div>
+
+
+<!-- Templates -->
+<script type="text/html" id="template-employee">
+    <article class="employee">
+        <img src="{{ url }}" />
+        <span class="name hidden">
+            <h2>{{ name }}</h2>
+        </span>
+    </article>
+</script>
+
+<script type="text/html" id="template-whois">
+    <h1>Who is {{ name }}?</h1>
+</script>
+
+<script type="text/html" id="template-scoreboard">
+    <div class="row">
+        <div class="col-lg-2 col-md-1 scoreboard">
+            <p>Two points for right-first-time</p>
+            <p>One point for second-guess-correct</p>
+            <p>Zero points for third-guess-correct</p>
+            <p>Lose one point for fourth-guess-correct</p>
+            <p>Lose two points for fifth-guess-correct</p>
+            <h2>Your score: {{ value }} </h2>
         </div>
+    </div>
+</script>
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="scripts/vendor/jquery.min.js"><\/script>')</script>
-        <script src="/scripts/main.js"></script>
-    </body>
-</html>
+<!-- Libs -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
+
+<!-- Logic -->
+<script>
+$(function() {
+    _.templateSettings = {
+      interpolate: /\{\{(.+?)\}\}/g
+    };
+
+
+    var employeeTemplate = _.template($('#template-employee').html());
+    var whoisTemplate = _.template($('#template-whois').html());
+    var scoreTemplate = _.template($('#template-scoreboard').html());
+
+    var crntGame, score = { value: 0, pointAvailable: 0 };
+
+    $('#face-wrapper').delegate('.employee', 'click', function() {
+        var name = $(this).find('h2').text();
+
+        if (name === crntGame.name) {
+            $(this).find('.hidden').removeClass('hidden').addClass('right');
+            setTimeout(refresh, 2000);
+            score.value += score.pointAvailable;
+        } else {
+            $(this).find('.hidden').removeClass('hidden').addClass('wrong');
+            score.pointAvailable -= 1;
+        }
+        $('#scoreboard-wrapper').html(scoreTemplate(score));
+    });
+
+    var refresh = function() {
+        crntGame = false;
+        score.pointAvailable = 2;
+        var $w = $('#face-wrapper');
+        $w.empty();
+
+        $.get('http://api.namegame.willowtreemobile.com').then(function(data) {
+            var pool = _.shuffle(data).slice(0,5);
+            var selected = _.shuffle(pool).slice(0,1)[0];
+
+            crntGame = selected;
+            _.each(pool, function(e) {
+                $w.append(employeeTemplate(e))
+            });
+            $('#question-wrapper').html(whoisTemplate(selected))
+        });
+
+        $('#scoreboard-wrapper').html(scoreTemplate(score));
+    }
+
+    refresh();
+
+});
+</script>
