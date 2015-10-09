@@ -3,10 +3,14 @@
 
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800|Open+Sans+Condensed:300,300italic,700' rel='stylesheet' type='text/css'>
 <link href="/styles/game-styles.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/styles/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css" />
 
 <!-- Markup -->
 <div id="app-wrapper">
-    <div id="scoreboard-wrapper"></div>
+    <div class="row">
+        <div id="scoreboard-wrapper"></div>
+        <div id="matt-wrapper"></div>
+    </div>
     <div id="question-wrapper"></div>
     <div id="face-wrapper"></div>
 </div>
@@ -27,15 +31,13 @@
 </script>
 
 <script type="text/html" id="template-scoreboard">
-    <div class="row">
-        <div class="col-lg-2 col-md-1 scoreboard">
-            <p>Two points for right-first-time</p>
-            <p>One point for second-guess-correct</p>
-            <p>Zero points for third-guess-correct</p>
-            <p>Lose one point for fourth-guess-correct</p>
-            <p>Lose two points for fifth-guess-correct</p>
-            <h2>Your score: {{ value }} </h2>
-        </div>
+    <div class="span4 scoreboard">
+        <p>Two points for right-first-time</p>
+        <p>One point for second-guess-correct</p>
+        <p>Zero points for third-guess-correct</p>
+        <p>Lose one point for fourth-guess-correct</p>
+        <p>Lose two points for fifth-guess-correct</p>
+        <h2>Your score: {{ value }} </h2>
     </div>
 </script>
 
