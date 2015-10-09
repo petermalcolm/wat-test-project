@@ -100,9 +100,18 @@ h2 {
 
 .scoreboard {
     background-color: rgba(240,240,240,0.8);
-    padding: 24px
+    padding: 24px;
 }
 .scoreboard p {
     line-height: 2px;
+    font-size: .8em;
+}
+
+#matt-wrapper {
+    background-color: rgba(240,240,240,0.8);
+    padding: 24px;
+    cursor: pointer;
+}
+#matt-wrapper p {
     font-size: .8em;
 }

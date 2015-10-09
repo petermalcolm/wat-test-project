@@ -9,7 +9,7 @@
 <div id="app-wrapper">
     <div class="row">
         <div id="scoreboard-wrapper"></div>
-        <div id="matt-wrapper"></div>
+        <div id="matt-wrapper" class="span2"></div>
     </div>
     <div id="question-wrapper"></div>
     <div id="face-wrapper"></div>
@@ -41,6 +41,12 @@
     </div>
 </script>
 
+<script type="text/html" id="template-matt">
+    <p>Only show people named Mat(t)!</p>
+    <div id="matt-mode-on" style="display:none;">Matt Mode ON</div>
+    <div id="matt-mode-off">Matt Mode OFF</div>
+</script>
+
 <!-- Libs -->
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
@@ -57,8 +63,16 @@ $(function() {
     var employeeTemplate = _.template($('#template-employee').html());
     var whoisTemplate = _.template($('#template-whois').html());
     var scoreTemplate = _.template($('#template-scoreboard').html());
+    var mattTemplate = _.template($('#template-matt').html());
 
     var crntGame, score = { value: 0, pointAvailable: 0 };
+    var mattMode = false;
+
+    $('#matt-wrapper').click(function(){
+        mattMode = !mattMode;
+        $('#matt-mode-on').toggle();
+        $('#matt-mode-off').toggle();
+    });
 
     $('#face-wrapper').delegate('.employee', 'click', function() {
         var name = $(this).find('h2').text();
@@ -81,6 +95,12 @@ $(function() {
         $w.empty();
 
         $.get('http://api.namegame.willowtreemobile.com').then(function(data) {
+            if(mattMode) {
+                data = _.filter(data, function(member){
+                    return member.name.indexOf("Mat") !== -1;
+                })
+            }
+
             var pool = _.shuffle(data).slice(0,5);
             var selected = _.shuffle(pool).slice(0,1)[0];
 
@@ -92,6 +112,12 @@ $(function() {
         });
 
         $('#scoreboard-wrapper').html(scoreTemplate(score));
+
+        $('#matt-wrapper').html(mattTemplate);
+        if(mattMode) {
+            $('#matt-mode-on').toggle();
+            $('#matt-mode-off').toggle();
+        }
     }
 
     refresh();
