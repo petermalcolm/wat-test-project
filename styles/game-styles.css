@@ -107,11 +107,11 @@ h2 {
     font-size: .8em;
 }
 
-#matt-wrapper {
+#matt-wrapper, #anagram-wrapper {
     background-color: rgba(240,240,240,0.8);
     padding: 24px;
     cursor: pointer;
 }
-#matt-wrapper p {
+#matt-wrapper p, #anagram-wrapper p {
     font-size: .8em;
 }

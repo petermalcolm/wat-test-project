@@ -9,7 +9,8 @@
 <div id="app-wrapper">
     <div class="row">
         <div id="scoreboard-wrapper"></div>
-        <div id="matt-wrapper" class="span2"></div>
+        <div id="matt-wrapper" class="span2 btn"></div>
+        <div id="anagram-wrapper" class="span2 btn"></div>
     </div>
     <div id="question-wrapper"></div>
     <div id="face-wrapper"></div>
@@ -47,6 +48,12 @@
     <div id="matt-mode-off">Matt Mode OFF</div>
 </script>
 
+<script type="text/html" id="template-anagram">
+    <p>Anagramatize names!</p>
+    <div id="anagram-mode-on" style="display:none;">Scramble Names Mode ON</div>
+    <div id="anagram-mode-off">Scramble Names Mode OFF</div>
+</script>
+
 <!-- Libs -->
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
@@ -55,6 +62,7 @@
 <!-- Logic -->
 <script>
 $(function() {
+
     _.templateSettings = {
       interpolate: /\{\{(.+?)\}\}/g
     };
@@ -64,14 +72,22 @@ $(function() {
     var whoisTemplate = _.template($('#template-whois').html());
     var scoreTemplate = _.template($('#template-scoreboard').html());
     var mattTemplate = _.template($('#template-matt').html());
+    var anagramTemplate = _.template($('#template-anagram').html());
 
     var crntGame, score = { value: 0, pointAvailable: 0 };
     var mattMode = false;
+    var anagramMode = false;
 
     $('#matt-wrapper').click(function(){
         mattMode = !mattMode;
         $('#matt-mode-on').toggle();
         $('#matt-mode-off').toggle();
+    });
+
+    $('#anagram-wrapper').click(function(){
+        anagramMode = !anagramMode;
+        $('#anagram-mode-on').toggle();
+        $('#anagram-mode-off').toggle();
     });
 
     $('#face-wrapper').delegate('.employee', 'click', function() {
@@ -103,12 +119,23 @@ $(function() {
 
             var pool = _.shuffle(data).slice(0,5);
             var selected = _.shuffle(pool).slice(0,1)[0];
+            var scrambled = {};
 
             crntGame = selected;
             _.each(pool, function(e) {
                 $w.append(employeeTemplate(e))
             });
-            $('#question-wrapper').html(whoisTemplate(selected))
+
+            if(anagramMode){
+                var spaceAt = selected.name.indexOf(' ');
+                var alias = _.shuffle(selected.name.toLowerCase().replace(/ /g,'').split('')).join('');
+                var firstName = alias.slice(0,1).toUpperCase() + alias.slice(1,spaceAt);
+                var lastName = alias.slice(spaceAt,spaceAt+1).toUpperCase() + alias.slice(spaceAt+1);
+                scrambled.name = firstName + ' ' + lastName;
+                $('#question-wrapper').html(whoisTemplate(scrambled));
+            }  else {
+                $('#question-wrapper').html(whoisTemplate(selected));
+            }
         });
 
         $('#scoreboard-wrapper').html(scoreTemplate(score));
@@ -118,6 +145,13 @@ $(function() {
             $('#matt-mode-on').toggle();
             $('#matt-mode-off').toggle();
         }
+
+        $('#anagram-wrapper').html(anagramTemplate);
+        if(anagramMode) {
+            $('#anagram-mode-on').toggle();
+            $('#anagram-mode-off').toggle();
+        }
+
     }
 
     refresh();
